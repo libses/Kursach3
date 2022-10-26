@@ -1,5 +1,10 @@
 ﻿namespace Kursach;
 
+public enum Dirs
+{
+    SS, SB, BS, BB
+}
+
 public static class AI
 {
     public static Point MaxDifference(Game game)
@@ -29,13 +34,8 @@ public static class AI
     public static Point MaxDifferenceFourSlices(Game game)
     {
         var cp = game.IsFirstMove ? new Point(game.Field.N, game.Field.N) : game.CurrentPoint;
-        var sth = DiveInto(6, cp, game);
+        var sth = DiveInto(4, cp, game);
         return sth.Item1;
-    }
-
-    public static Point DeepAndFirst(Game game)
-    {
-        return new Point(0, 0);
     }
 
     private static (Point, int) DiveInto(int depth, Point point, Game game)
@@ -107,16 +107,16 @@ public class Program
 
     static void Main(string[] args)
     {
-        var aiPlayers = new Dictionary<AIPlayer, int>() 
+        var aiPlayers = new Dictionary<AIPlayer, int>()
         {
-            { new AIPlayer(AI.Max, "Максимальная клетка"), 0 },
-            { new AIPlayer(AI.Random, "Рандом"), 0 },
+            //{ new AIPlayer(AI.Max, "Максимальная клетка"), 0 },
+            //{ new AIPlayer(AI.Random, "Рандом"), 0 },
             { new AIPlayer(AI.MaxDifference, "Максимальное матожидание одного хода"), 0 },
             { new AIPlayer(AI.MaxDifferenceFourSlices, "Максимальное ожидание нескольких ходов"), 0 }
         };
 
 
-        var gamesPlayed = 3;
+        var gamesPlayed = 50;
         foreach (var firstPlayer in aiPlayers.Keys)
         {
             foreach (var secondPlayer in aiPlayers.Keys)
