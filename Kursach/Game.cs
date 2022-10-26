@@ -11,7 +11,7 @@ public class Game
     public bool IsFirstMove { get; set; }
 
     public List<IPlayer> Players { get; set; }
-    private int playerCounter;
+    public int playerCounter;
     public Dictionary<IPlayer, List<Cell>> PlayerVisited = new Dictionary<IPlayer, List<Cell>>();
 
     public Game(int n)
