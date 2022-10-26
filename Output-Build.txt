@@ -1,0 +1,7 @@
+﻿Build started...
+1>------ Build started: Project: Kursach, Configuration: Release Any CPU ------
+1>C:\Users\Dmitry\source\repos\Kursach\Kursach\Program.cs(109,12,109,16): warning CS8618: Non-nullable property 'CurrentPoint' must contain a non-null value when exiting constructor. Consider declaring the property as nullable.
+1>C:\Users\Dmitry\source\repos\Kursach\Kursach\Program.cs(19,16,19,102): warning CS8603: Possible null reference return.
+1>Kursach -> C:\Users\Dmitry\source\repos\Kursach\Kursach\bin\Release\net6.0\Kursach.dll
+1>Done building project "Kursach.csproj".
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
