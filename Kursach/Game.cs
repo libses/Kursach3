@@ -21,6 +21,13 @@ public class Game
         Players = new List<IPlayer>();
     }
 
+    public Game(int[,] matrix)
+    {
+        Field = new Field(matrix);
+        IsFirstMove = true;
+        Players = new List<IPlayer>();
+    }
+
     public void RegisterPlayer(IPlayer player)
     {
         Players.Add(player);
@@ -31,6 +38,13 @@ public class Game
     {
         var player = Players[playerCounter];
         var point = player.GetMove(this);
+        if (CurrentPoint != null)
+        {
+            if ((Math.Abs(CurrentPoint.X - point.X) + Math.Abs(CurrentPoint.Y - point.Y)) > 1)
+            {
+                throw new Exception(player.GetName() + "мухлюет");
+            }
+        }
         if (!IsSilent)
         {
             Console.WriteLine($"{player.GetName()} ходит");

@@ -30,6 +30,20 @@ public class Field
         FillField();
     }
 
+    public Field(int[,] matrix)
+    {
+        Size = matrix.GetLength(0);
+        Map = new Cell[Size, Size];
+        N = (Size - 1) / 2;
+        for (int x = 0; x < Size; x++)
+        {
+            for (int y = 0; y < Size; y++)
+            {
+                Map[x, y] = new Cell(matrix[x, y]);
+            }
+        }
+    }
+
     public override string ToString()
     {
         var sb = new StringBuilder();

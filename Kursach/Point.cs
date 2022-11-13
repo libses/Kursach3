@@ -40,4 +40,15 @@ public class Point
     {
         return $"X = {X}, Y = {Y}";
     }
+
+    public override int GetHashCode()
+    {
+        return X + 20 * Y;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        var p = (Point)obj;
+        return p.X == X && p.Y == Y;
+    }
 }
