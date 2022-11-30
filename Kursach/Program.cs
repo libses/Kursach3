@@ -75,8 +75,7 @@ public static class AI
                 foreach (var point in nicePoints)
                 {
                     var number = node.IsMine ? -point.GetNumber(game) : point.GetNumber(game);
-                    var childNode = new Node(number, point, !node.IsMine, false);
-                    childNode.AddParent(node);
+                    var childNode = new Node(number, point, !node.IsMine, false, node);
                     queue.Enqueue(childNode);
                 }
 
@@ -110,8 +109,7 @@ public static class AI
                 foreach (var point in nicePoints)
                 {
                     var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
-                    var childNode = new Node(number, point, depth % 2 == 0, false);
-                    childNode.AddParent(node);
+                    var childNode = new Node(number, point, depth % 2 == 0, false, node);
                     queue.Enqueue(childNode);
                 }
 

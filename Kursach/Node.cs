@@ -8,12 +8,13 @@
         public int D { get; set; }
         public Node? Parent { get; set; }
         public int Number { get; set; }
-        public HashSet<Point> Visited = new HashSet<Point>(16);
+        public List<Point> Visited;
         public Node(int number, Point point, bool isMine, bool isFirstMove)
         {
             Number = number;
             Children = new List<Node>();
             Point = point;
+            Visited = new List<Point>();
             if (!isFirstMove)
             {
                 Visited.Add(point);
@@ -22,9 +23,27 @@
             IsMine = isMine;
         }
 
+        public Node(int number, Point point, bool isMine, bool isFirstMove, Node parent)
+        {
+            Number = number;
+            Children = new List<Node>();
+            Point = point;
+            Visited = new List<Point>(parent.Visited);
+            if (!isFirstMove)
+            {
+                Visited.Add(point);
+            }
+
+            parent.Children.Add(this);
+            Parent = parent;
+
+            IsMine = isMine;
+        }
+
+
         public void AddParent(Node parent)
         {
-            Visited.UnionWith(parent.Visited);
+            Visited.AddRange(parent.Visited);
             parent.Children.Add(this);
             Parent = parent;
         }
