@@ -20,7 +20,7 @@ public static class AI
         //minmax?
         var queue = new Queue<Node>();
         var start = game.CurrentPoint ?? new Point(game.Field.N, game.Field.N);
-        var startNode = new Node(0, start, false);
+        var startNode = new Node(0, start, false, game.CurrentPoint == null);
         queue.Enqueue(startNode);
         int depthValue = 1;
         int depth = 0;
@@ -35,7 +35,7 @@ public static class AI
             foreach (var point in nicePoints)
             {
                 var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
-                var childNode = new Node(number, point, depth % 2 == 0);
+                var childNode = new Node(number, point, depth % 2 == 0, false);
                 childNode.AddParent(node);
                 queue.Enqueue(childNode);
             }
@@ -52,36 +52,30 @@ public static class AI
     }
 
     public static Node root;
-    //продолжать строить известное дерево
-    //попробовать НЕ дерево
 
     public static Point DeepPurpleSmart(Game game)
     {
-        //minmax?
         var queue = new Queue<Node>();
         var start = game.CurrentPoint ?? new Point(game.Field.N, game.Field.N);
         if (root != null && root.Children.Select(x => x.Point).Contains(start))
         {
             var startNode = root.Children.First(x => x.Point.Equals(start));
-            startNode.Parent = null;
             startNode.ClearTrash(game);
-            var allChilds = new List<Node>();
-            startNode.GetAllChilds(allChilds, game);
-            queue = new Queue<Node>(allChilds);
-            int depthValue = allChilds.Count;
+            var kids = startNode.GetAllChilds(new List<Node>(), game);
+            int depthValue = kids.Count;
+            queue = new Queue<Node>(kids);
             int depth = 0;
             var maxDepth = 2;
             while (depth < maxDepth && queue.Count > 0)
             {
                 var node = queue.Dequeue();
-                
                 depthValue--;
                 var nicePoints = GetNicePoints(game, node).Where(x => !node.Visited.Contains(x));
 
                 foreach (var point in nicePoints)
                 {
-                    var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
-                    var childNode = new Node(number, point, depth % 2 == 0);
+                    var number = node.IsMine ? -point.GetNumber(game) : point.GetNumber(game);
+                    var childNode = new Node(number, point, !node.IsMine, false);
                     childNode.AddParent(node);
                     queue.Enqueue(childNode);
                 }
@@ -94,20 +88,15 @@ public static class AI
             }
 
             startNode.CountAllPaths();
-            var res = startNode.Children.Where(x => !game.Field[x.Point].IsVisited).MaxBy(x => x.GetMagicValue());
+            var res = startNode.Children.MaxBy(x => x.GetMagicValue());
             root = res;
-            if (res == null)
-            {
-                return GetNicePoints(game, startNode).First();
-            }
-            else
-            {
-                return res.Point;
-            }
+            root.Parent.Children.Remove(root);
+            root.Parent = null;
+            return res.Point;
         }
         else
         {
-            var startNode = new Node(0, start, false);
+            var startNode = new Node(0, start, false, game.CurrentPoint == null);
             queue.Enqueue(startNode);
             int depthValue = 1;
             int depth = 0;
@@ -121,7 +110,7 @@ public static class AI
                 foreach (var point in nicePoints)
                 {
                     var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
-                    var childNode = new Node(number, point, depth % 2 == 0);
+                    var childNode = new Node(number, point, depth % 2 == 0, false);
                     childNode.AddParent(node);
                     queue.Enqueue(childNode);
                 }
@@ -204,7 +193,7 @@ public class Program
         };
 
 
-        var gamesPlayed = 40;
+        var gamesPlayed = 2;
         foreach (var firstPlayer in aiPlayers.Keys)
         {
             foreach (var secondPlayer in aiPlayers.Keys)

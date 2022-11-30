@@ -8,13 +8,17 @@
         public int D { get; set; }
         public Node? Parent { get; set; }
         public int Number { get; set; }
-        public HashSet<Point> Visited = new HashSet<Point>();
-        public Node(int number, Point point, bool isMine)
+        public HashSet<Point> Visited = new HashSet<Point>(16);
+        public Node(int number, Point point, bool isMine, bool isFirstMove)
         {
             Number = number;
             Children = new List<Node>();
             Point = point;
-            Visited.Add(point);
+            if (!isFirstMove)
+            {
+                Visited.Add(point);
+            }
+            
             IsMine = isMine;
         }
 
@@ -41,6 +45,7 @@
                 var current = Children[i];
                 if (game.Field[current.Point].IsVisited)
                 {
+                    current.Parent = null;
                     Children.RemoveAt(i);
                 }
                 else
@@ -50,7 +55,7 @@
             }
         }
 
-        public void GetAllChilds(List<Node> list, Game game)
+        public List<Node> GetAllChilds(List<Node> list, Game game)
         {
             if (Children.Count == 0)
             {
@@ -58,14 +63,13 @@
             }
             else
             {
-                if (!game.Field[this.Point].IsVisited)
+                foreach (var child in Children)
                 {
-                    foreach (var child in Children)
-                    {
-                        child.GetAllChilds(list, game);
-                    }
-                }       
+                    child.GetAllChilds(list, game);
+                }
             }
+
+            return list;
         }
 
         public int GetMagicValue()

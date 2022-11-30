@@ -61,26 +61,6 @@ public class Game
         playerCounter = (playerCounter + 1) % Players.Count;
     }
 
-    private void AskForFirstMove()
-    {
-        var player = Players[playerCounter];
-        var point = player.GetFirstMove(this);
-        if (!IsSilent)
-        {
-            Console.WriteLine($"{player.GetName()} ходит");
-        }
-
-        PlayerVisited[player].Add(Field.Map[point.X, point.Y]);
-        if (Field.Map[point.X, point.Y].IsVisited)
-        {
-            throw new Exception("VISITED");
-        }
-
-        Field.Map[point.X, point.Y].IsVisited = true;
-        CurrentPoint = point;
-        playerCounter = (playerCounter + 1) % Players.Count;
-    }
-
     public void StartGame()
     {
         AskForMove();
