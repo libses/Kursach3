@@ -34,6 +34,40 @@
             }
         }
 
+        public void ClearTrash(Game game)
+        {
+            for (int i = 0; i < Children.Count; i++)
+            {
+                var current = Children[i];
+                if (game.Field[current.Point].IsVisited)
+                {
+                    Children.RemoveAt(i);
+                }
+                else
+                {
+                    current.ClearTrash(game);
+                }
+            }
+        }
+
+        public void GetAllChilds(List<Node> list, Game game)
+        {
+            if (Children.Count == 0)
+            {
+                list.Add(this);
+            }
+            else
+            {
+                if (!game.Field[this.Point].IsVisited)
+                {
+                    foreach (var child in Children)
+                    {
+                        child.GetAllChilds(list, game);
+                    }
+                }       
+            }
+        }
+
         public int GetMagicValue()
         {
             if (Children.Count == 0)

@@ -51,6 +51,95 @@ public static class AI
         return startNode.Children.MaxBy(x => x.GetMagicValue()).Point;
     }
 
+    public static Node root;
+    //продолжать строить известное дерево
+    //попробовать НЕ дерево
+
+    public static Point DeepPurpleSmart(Game game)
+    {
+        //minmax?
+        var queue = new Queue<Node>();
+        var start = game.CurrentPoint ?? new Point(game.Field.N, game.Field.N);
+        if (root != null && root.Children.Select(x => x.Point).Contains(start))
+        {
+            var startNode = root.Children.First(x => x.Point.Equals(start));
+            startNode.Parent = null;
+            startNode.ClearTrash(game);
+            var allChilds = new List<Node>();
+            startNode.GetAllChilds(allChilds, game);
+            queue = new Queue<Node>(allChilds);
+            int depthValue = allChilds.Count;
+            int depth = 0;
+            var maxDepth = 2;
+            while (depth < maxDepth && queue.Count > 0)
+            {
+                var node = queue.Dequeue();
+                
+                depthValue--;
+                var nicePoints = GetNicePoints(game, node).Where(x => !node.Visited.Contains(x));
+
+                foreach (var point in nicePoints)
+                {
+                    var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
+                    var childNode = new Node(number, point, depth % 2 == 0);
+                    childNode.AddParent(node);
+                    queue.Enqueue(childNode);
+                }
+
+                if (depthValue == 0)
+                {
+                    depthValue = queue.Count;
+                    depth++;
+                }
+            }
+
+            startNode.CountAllPaths();
+            var res = startNode.Children.Where(x => !game.Field[x.Point].IsVisited).MaxBy(x => x.GetMagicValue());
+            root = res;
+            if (res == null)
+            {
+                return GetNicePoints(game, startNode).First();
+            }
+            else
+            {
+                return res.Point;
+            }
+        }
+        else
+        {
+            var startNode = new Node(0, start, false);
+            queue.Enqueue(startNode);
+            int depthValue = 1;
+            int depth = 0;
+            var maxDepth = 8;
+            while (depth < maxDepth && queue.Count > 0)
+            {
+                var node = queue.Dequeue();
+                depthValue--;
+                var nicePoints = GetNicePoints(game, node).Where(x => !node.Visited.Contains(x));
+
+                foreach (var point in nicePoints)
+                {
+                    var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
+                    var childNode = new Node(number, point, depth % 2 == 0);
+                    childNode.AddParent(node);
+                    queue.Enqueue(childNode);
+                }
+
+                if (depthValue == 0)
+                {
+                    depthValue = queue.Count;
+                    depth++;
+                }
+            }
+
+            startNode.CountAllPaths();
+            var res = startNode.Children.MaxBy(x => x.GetMagicValue());
+            root = res;
+            return res.Point;
+        }
+    }
+
     private static Point[] GetNicePoints(Game game, Node node)
     {
         if (game.IsFirstMove)
@@ -109,12 +198,13 @@ public class Program
     {
         var aiPlayers = new Dictionary<AIPlayer, int>()
         {
-            { new AIPlayer(AI.Max, "Максимальная клетка"), 0 },
+            //{ new AIPlayer(AI.Max, "Максимальная клетка"), 0 },
             { new AIPlayer(AI.DeepPurple, "DeepPurple AI"), 0 },
+            { new AIPlayer(AI.DeepPurpleSmart, "DeepPurple SMART"), 0 },
         };
 
 
-        var gamesPlayed = 20;
+        var gamesPlayed = 40;
         foreach (var firstPlayer in aiPlayers.Keys)
         {
             foreach (var secondPlayer in aiPlayers.Keys)
