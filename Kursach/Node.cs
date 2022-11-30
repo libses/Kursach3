@@ -2,30 +2,20 @@
 {
     public class Node
     {
+        public bool IsMine { get; set; }
         public Point Point { get; set; }
         public List<Node> Children { get; set; }
+        public int D { get; set; }
         public Node? Parent { get; set; }
         public int Number { get; set; }
-        public int Depth { get; set; }
         public HashSet<Point> Visited = new HashSet<Point>();
-        public Node(int number, Point point, int depth)
+        public Node(int number, Point point, bool isMine)
         {
             Number = number;
             Children = new List<Node>();
             Point = point;
-            Depth = depth;
             Visited.Add(point);
-        }
-
-        public int GetValue()
-        {
-            var coeff = Depth % 2 == 0 ? 1 : -1;
-            if (Children.Count == 0)
-            {
-                return coeff * Number;
-            }
-
-            return coeff * Number + Children.Select(x => x.GetValue()).Max();
+            IsMine = isMine;
         }
 
         public void AddParent(Node parent)
@@ -33,6 +23,34 @@
             Visited.UnionWith(parent.Visited);
             parent.Children.Add(this);
             Parent = parent;
+        }
+
+        public void CountAllPaths()
+        {
+            foreach (var child in Children)
+            {
+                child.D = child.Number + D;
+                child.CountAllPaths();
+            }
+        }
+
+        public int GetMagicValue()
+        {
+            if (Children.Count == 0)
+            {
+                return D;
+            }
+            else
+            {
+                if (!IsMine)
+                {
+                    return Children.Max(x => x.GetMagicValue());
+                }
+                else
+                {
+                    return Children.Min(x => x.GetMagicValue());
+                }
+            }
         }
 
         public override string ToString()
