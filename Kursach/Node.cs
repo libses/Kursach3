@@ -6,7 +6,6 @@
         public Point Point { get; set; }
         public List<Node> Children { get; set; }
         public int D { get; set; }
-        public Node? Parent { get; set; }
         public int Number { get; set; }
         public List<Point> Visited;
         public Node(int number, Point point, bool isMine, bool isFirstMove)
@@ -35,8 +34,6 @@
             }
 
             parent.Children.Add(this);
-            Parent = parent;
-
             IsMine = isMine;
         }
 
@@ -45,7 +42,6 @@
         {
             Visited.AddRange(parent.Visited);
             parent.Children.Add(this);
-            Parent = parent;
         }
 
         public void CountAllPaths()
@@ -64,7 +60,6 @@
                 var current = Children[i];
                 if (game.Field[current.Point].IsVisited)
                 {
-                    current.Parent = null;
                     Children.RemoveAt(i);
                 }
                 else

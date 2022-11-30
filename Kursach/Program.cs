@@ -88,9 +88,8 @@ public static class AI
 
             startNode.CountAllPaths();
             var res = startNode.Children.MaxBy(x => x.GetMagicValue());
+            startNode.Children.Remove(res);
             root = res;
-            root.Parent.Children.Remove(root);
-            root.Parent = null;
             return res.Point;
         }
         else
@@ -99,7 +98,7 @@ public static class AI
             queue.Enqueue(startNode);
             int depthValue = 1;
             int depth = 0;
-            var maxDepth = 8;
+            var maxDepth = 10;
             while (depth < maxDepth && queue.Count > 0)
             {
                 var node = queue.Dequeue();
@@ -183,15 +182,16 @@ public class Program
 
     static void Main(string[] args)
     {
-        var aiPlayers = new Dictionary<AIPlayer, int>()
+        var aiPlayers = new Dictionary<IPlayer, int>()
         {
-            //{ new AIPlayer(AI.Max, "Максимальная клетка"), 0 },
-            { new AIPlayer(AI.DeepPurple, "DeepPurple AI"), 0 },
+            { new AIPlayer(AI.Max, "Максимальная клетка"), 0 },
+            //{ new AIPlayer(AI.DeepPurple, "DeepPurple AI"), 0 },
             { new AIPlayer(AI.DeepPurpleSmart, "DeepPurple SMART"), 0 },
+            //{ new ReadLinePlayer(new WASDMapper()), 0 }
         };
 
 
-        var gamesPlayed = 2;
+        var gamesPlayed = 1;
         foreach (var firstPlayer in aiPlayers.Keys)
         {
             foreach (var secondPlayer in aiPlayers.Keys)
