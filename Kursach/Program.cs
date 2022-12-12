@@ -162,8 +162,5 @@ public class Program
             var winrate = (double)aiPlayers[player] / (gamesPlayed * (aiPlayers.Count) * (aiPlayers.Count - 1));
             Console.WriteLine($"Winrate of {player.GetName()} is {winrate}");
         }
-
-        Console.WriteLine("Среднее количество ходов");
-        Console.WriteLine(list.Average());
     }
 }
