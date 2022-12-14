@@ -4,14 +4,20 @@ public static class PointExtensions
 {
     public static Point[] Directions = new Point[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
     public static Point[] FirstDirections = new Point[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0), new(1, 1), new(1, -1), new(-1, 1), new(-1, -1), new(0, 0) };
-    public static Point[] GetNearPoints(this Point point)
+    public static IEnumerable<Point> GetNearPoints(this Point point)
     {
-        return Directions.Select(x => x + point).ToArray();
+        foreach (var dir in Directions)
+        {
+            yield return dir + point;
+        }
     }
 
     public static IEnumerable<Point> GetNearFirstPoints(this Point point)
     {
-        return FirstDirections.Select(x => x + point);
+        foreach (var dir in FirstDirections)
+        {
+            yield return dir + point;
+        }
     }
 
     public static IEnumerable<Point> GetNearGoodPoints(this Point point, Game game)
@@ -24,12 +30,11 @@ public static class PointExtensions
                 yield return p;
             }
         }
-        //return point.GetNearPoints().Where(x => x.IsInsideField(game.Field.Size) && !game.Field.Map[x.X, x.Y].IsVisited);
     }
 
-    public static Point[] GetNearGoodFirstPoints(this Point point, Game game)
+    public static IEnumerable<Point> GetNearGoodFirstPoints(this Point point, Game game)
     {
-        return point.GetNearFirstPoints().Where(x => x.IsInsideField(game.Field.Size) && !game.Field.Map[x.X, x.Y].IsVisited).ToArray();
+        return point.GetNearFirstPoints().Where(x => x.IsInsideField(game.Field.Size) && !game.Field.Map[x.X, x.Y].IsVisited);
     }
 
     public static int GetNumber(this Point point, Game game)

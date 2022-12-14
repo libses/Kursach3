@@ -37,7 +37,7 @@ public static class AI
             var node = queue.Dequeue();
             allNodes.Add(node);
             depthValue--;
-            var nicePoints = Nicest(GetNicePoints(game, node), node.Visited);//.Where(x => !node.Visited.Contains(x));
+            var nicePoints = Nicest(GetNicePoints(game, node), node.Visited);
             foreach (var point in nicePoints)
             {
                 var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
@@ -81,7 +81,7 @@ public static class AI
 
     }
 
-    private static Point[] GetStartPoints(Game game)
+    private static IEnumerable<Point> GetStartPoints(Game game)
     {
         var res = new Point(game.Field.N, game.Field.N).GetNearGoodFirstPoints(game);
         return res;
