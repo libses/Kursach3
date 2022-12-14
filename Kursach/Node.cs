@@ -2,11 +2,11 @@
 {
     public class Node
     {
-        public bool IsMine { get; set; }
-        public Point Point { get; set; }
-        public List<Node> Children { get; set; }
-        public int D { get; set; }
-        public int Number { get; set; }
+        public bool IsMine;
+        public Point Point;
+        public List<Node> Children;
+        public int D;
+        public int Number;
         public List<Point> Visited;
         public Node(int number, Point point, bool isMine, bool isFirstMove)
         {

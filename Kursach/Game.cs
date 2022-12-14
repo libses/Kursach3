@@ -4,13 +4,13 @@ namespace Kursach;
 
 public class Game
 {
-    public bool IsSilent { get; set; }
-    public Point CurrentPoint { get; set; }
-    public Field Field { get; set; }
-    
-    public bool IsFirstMove { get; set; }
+    public bool IsSilent;
+    public Point CurrentPoint;
+    public Field Field;
 
-    public List<IPlayer> Players { get; set; }
+    public bool IsFirstMove;
+
+    public List<IPlayer> Players;
     public int playerCounter;
     public Dictionary<IPlayer, List<Cell>> PlayerVisited = new Dictionary<IPlayer, List<Cell>>();
 
@@ -21,7 +21,7 @@ public class Game
         Players = new List<IPlayer>();
     }
 
-    public Game(int[,] matrix)
+    public Game(byte[,] matrix)
     {
         Field = new Field(matrix);
         IsFirstMove = true;

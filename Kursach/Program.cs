@@ -1,15 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace Kursach;
+﻿namespace Kursach;
 
 public static class AI
 {
-    public static Point Max(Game game)
-    {
-        var goodPoints = GetGoodPoints(game);
-        return goodPoints.Any() ? goodPoints.MaxBy(x => game.Field[x].Number) : throw new Exception();
-    }
-
     public static IEnumerable<Point> Nicest(IEnumerable<Point> points, List<Point> visited)
     {
         foreach (var point in points)
@@ -23,8 +15,6 @@ public static class AI
 
     public static Point DeepPurple(Game game)
     {
-        var sw = new Stopwatch();
-        sw.Start();
         var queue = new Queue<Node>();
         var start = game.CurrentPoint ?? new Point(game.Field.N, game.Field.N);
         var startNode = new Node(0, start, false, game.CurrentPoint == null);
@@ -32,7 +22,7 @@ public static class AI
         int depthValue = 1;
         int depth = 0;
         var allNodes = new List<Node>();
-        while (depth < 12 && queue.Count > 0)
+        while (depth < 14 && queue.Count > 0)
         {
             var node = queue.Dequeue();
             allNodes.Add(node);
@@ -61,8 +51,6 @@ public static class AI
             return new Point(-1, -1);
         }
 
-        sw.Stop();
-        Console.WriteLine(sw.ElapsedMilliseconds);
         return res.Point;
     }
 
@@ -100,34 +88,25 @@ public class Program
 
     static void Main(string[] args)
     {
-        var isReal = false;
-        if (isReal)
+        FirstTime();
+        var res = AI.DeepPurple(game);
+        game.Field[res].IsVisited = true;
+        Console.WriteLine($"{res.X} {res.Y}");
+        while (true)
         {
-            FirstTime();
-            var res = AI.DeepPurple(game);
-            game.Field[res].IsVisited = true;
-            Console.WriteLine($"{res.X} {res.Y}");
-            while (true)
+            var game = SecondTime();
+            res = AI.DeepPurple(game);
+            if (res.X != -1)
             {
-                var game = SecondTime();
-                res = AI.DeepPurple(game);
-                if (res.X != -1)
-                {
-                    game.Field[res].IsVisited = true;
-                    game.CurrentPoint = res;
-                }
-                else
-                {
-                    return;
-                }
-
-                Console.WriteLine($"{res.X} {res.Y}");
+                game.Field[res].IsVisited = true;
+                game.CurrentPoint = res;
             }
-        }
-        else
-        {
-            var game = new Game(11);
-            var res = AI.DeepPurple(game);
+            else
+            {
+                return;
+            }
+
+            Console.WriteLine($"{res.X} {res.Y}");
         }
     }
 
@@ -138,7 +117,7 @@ public class Program
 
         for (var y = 0; y < n ; y++)
         {
-            var row = Console.ReadLine().Split().Select(x => int.Parse(x)).ToArray();
+            var row = Console.ReadLine().Split().Select(x => byte.Parse(x)).ToArray();
             for (int x = 0; x < n; x++)
             {
                 game.Field.Map[x, y] = new Cell(row[x]);

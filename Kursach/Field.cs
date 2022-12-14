@@ -4,10 +4,10 @@ namespace Kursach;
 
 public class Field
 {
-    public int N { get; set; }
-    public int Size { get; set; }
+    public int N;
+    public int Size;
 
-    public Cell[,] Map { get; set; }
+    public Cell[,] Map;
 
     public Cell this[Point point]
     {
@@ -30,7 +30,7 @@ public class Field
         FillField();
     }
 
-    public Field(int[,] matrix)
+    public Field(byte[,] matrix)
     {
         Size = matrix.GetLength(0);
         Map = new Cell[Size, Size];
@@ -67,7 +67,7 @@ public class Field
         {
             for (int y = 0; y < Size; y++)
             {
-                Map[x, y] = new Cell(random.Next(0, 10));
+                Map[x, y] = new Cell((byte)random.Next(0, 10));
             }
         }
     }

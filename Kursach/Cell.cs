@@ -2,10 +2,10 @@
 
 public class Cell
 {
-    public bool IsVisited { get; set; }
-    public int Number { get; set; }
+    public bool IsVisited;
+    public byte Number;
 
-    public Cell(int n)
+    public Cell(byte n)
     {
         Number = n;
         IsVisited = false;
