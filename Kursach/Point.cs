@@ -8,9 +8,9 @@ public class Point
         Y = y;
     }
 
-    public int X { get; set; }
+    public int X;
 
-    public int Y { get; set; }
+    public int Y;
 
     public bool IsInsideRectangle(int x1, int x2, int y1, int y2)
     {

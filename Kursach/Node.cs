@@ -11,9 +11,9 @@
         public Node(int number, Point point, bool isMine, bool isFirstMove)
         {
             Number = number;
-            Children = new List<Node>();
+            Children = new List<Node>(4);
             Point = point;
-            Visited = new List<Point>();
+            Visited = new List<Point>(16);
             if (!isFirstMove)
             {
                 Visited.Add(point);
@@ -21,22 +21,6 @@
             
             IsMine = isMine;
         }
-
-        public Node(int number, Point point, bool isMine, bool isFirstMove, Node parent)
-        {
-            Number = number;
-            Children = new List<Node>();
-            Point = point;
-            Visited = new List<Point>(parent.Visited);
-            if (!isFirstMove)
-            {
-                Visited.Add(point);
-            }
-
-            parent.Children.Add(this);
-            IsMine = isMine;
-        }
-
 
         public void AddParent(Node parent)
         {
@@ -50,22 +34,6 @@
             {
                 child.D = child.Number + D;
                 child.CountAllPaths();
-            }
-        }
-
-        public void ClearTrash(Game game)
-        {
-            for (int i = 0; i < Children.Count; i++)
-            {
-                var current = Children[i];
-                if (game.Field[current.Point].IsVisited)
-                {
-                    Children.RemoveAt(i);
-                }
-                else
-                {
-                    current.ClearTrash(game);
-                }
             }
         }
 

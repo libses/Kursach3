@@ -9,14 +9,22 @@ public static class PointExtensions
         return Directions.Select(x => x + point).ToArray();
     }
 
-    public static Point[] GetNearFirstPoints(this Point point)
+    public static IEnumerable<Point> GetNearFirstPoints(this Point point)
     {
-        return FirstDirections.Select(x => x + point).ToArray();
+        return FirstDirections.Select(x => x + point);
     }
 
-    public static Point[] GetNearGoodPoints(this Point point, Game game)
+    public static IEnumerable<Point> GetNearGoodPoints(this Point point, Game game)
     {
-        return point.GetNearPoints().Where(x => x.IsInsideField(game.Field.Size) && !game.Field.Map[x.X, x.Y].IsVisited).ToArray();
+        var near = point.GetNearPoints();
+        foreach (var p in near)
+        {
+            if (p.IsInsideField(game.Field.Size) && !game.Field[p].IsVisited)
+            {
+                yield return p;
+            }
+        }
+        //return point.GetNearPoints().Where(x => x.IsInsideField(game.Field.Size) && !game.Field.Map[x.X, x.Y].IsVisited);
     }
 
     public static Point[] GetNearGoodFirstPoints(this Point point, Game game)

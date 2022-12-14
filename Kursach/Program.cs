@@ -1,12 +1,6 @@
-﻿using ILGPU.Runtime;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Kursach;
-
-public enum Dirs
-{
-    SS, SB, BS, BB
-}
 
 public static class AI
 {
@@ -16,8 +10,21 @@ public static class AI
         return goodPoints.Any() ? goodPoints.MaxBy(x => game.Field[x].Number) : throw new Exception();
     }
 
+    public static IEnumerable<Point> Nicest(IEnumerable<Point> points, List<Point> visited)
+    {
+        foreach (var point in points)
+        {
+            if (!visited.Contains(point))
+            {
+                yield return point;
+            }
+        }
+    }
+
     public static Point DeepPurple(Game game)
     {
+        var sw = new Stopwatch();
+        sw.Start();
         var queue = new Queue<Node>();
         var start = game.CurrentPoint ?? new Point(game.Field.N, game.Field.N);
         var startNode = new Node(0, start, false, game.CurrentPoint == null);
@@ -25,13 +32,12 @@ public static class AI
         int depthValue = 1;
         int depth = 0;
         var allNodes = new List<Node>();
-        while (depth < 10 && queue.Count > 0)
+        while (depth < 12 && queue.Count > 0)
         {
-            
             var node = queue.Dequeue();
             allNodes.Add(node);
             depthValue--;
-            var nicePoints = GetNicePoints(game, node).Where(x => !node.Visited.Contains(x)).ToArray();
+            var nicePoints = Nicest(GetNicePoints(game, node), node.Visited);//.Where(x => !node.Visited.Contains(x));
             foreach (var point in nicePoints)
             {
                 var number = depth % 2 == 0 ? point.GetNumber(game) : -point.GetNumber(game);
@@ -49,11 +55,18 @@ public static class AI
 
         startNode.CountAllPaths();
         var res = startNode.Children.MaxBy(x => x.GetMagicValue());
-        
+
+        if (res == null)
+        {
+            return new Point(-1, -1);
+        }
+
+        sw.Stop();
+        Console.WriteLine(sw.ElapsedMilliseconds);
         return res.Point;
     }
 
-    private static Point[] GetNicePoints(Game game, Node node)
+    private static IEnumerable<Point> GetNicePoints(Game game, Node node)
     {
         if (game.IsFirstMove)
         {
@@ -74,7 +87,7 @@ public static class AI
         return res;
     }
 
-    private static Point[] GetGoodPoints(Game game)
+    private static IEnumerable<Point> GetGoodPoints(Game game)
     {
         var res = game.IsFirstMove ? GetStartPoints(game) : game.CurrentPoint.GetNearGoodPoints(game);
         return res;
@@ -83,84 +96,77 @@ public static class AI
 
 public class Program
 {
-    private static Game GetGame()
-    {
-        var game = new Game(5);
-        game.IsSilent = true;
-        //game.CurrentPoint = new Point(5, 5);
-        //game.Field.Map[game.CurrentPoint.X, game.CurrentPoint.Y].IsVisited = true;
-        return game;
-    }
-
-    private static int[,] GetMatrix()
-    {
-        var matrix = new int[11, 11];
-        for (int y = 0; y < 11; y++)
-        {
-            var temp = Console.ReadLine().Split().Select(int.Parse).ToArray();
-            for (int x = 0; x < 11; x++)
-            {
-                matrix[x, y] = temp[x];
-            }
-        }
-
-        return matrix;
-    }
-
-    private static string GetInfoString(Accelerator a)
-    {
-        StringWriter infoString = new StringWriter();
-        a.PrintInformation(infoString);
-        return infoString.ToString();
-    }
+    private static Game game;
 
     static void Main(string[] args)
     {
-        var aiPlayers = new Dictionary<IPlayer, int>()
+        var isReal = false;
+        if (isReal)
         {
-            { new AIPlayer(AI.Max, "Максимальная клетка"), 0 },
-            { new AIPlayer(AI.DeepPurple, "DeepPurple AI 1"), 0 },
-            //{ new AIPlayer(AI.DeepPurpleSmart, "DeepPurple SMART"), 0 },
-            //{ new ReadLinePlayer(new WASDMapper()), 0 }
-        };
-
-        var list = new List<int>();
-        var gamesPlayed = 20;
-        foreach (var firstPlayer in aiPlayers.Keys)
-        {
-            foreach (var secondPlayer in aiPlayers.Keys)
+            FirstTime();
+            var res = AI.DeepPurple(game);
+            game.Field[res].IsVisited = true;
+            Console.WriteLine($"{res.X} {res.Y}");
+            while (true)
             {
-                if (firstPlayer == secondPlayer)
+                var game = SecondTime();
+                res = AI.DeepPurple(game);
+                if (res.X != -1)
                 {
-                    continue;
+                    game.Field[res].IsVisited = true;
+                    game.CurrentPoint = res;
+                }
+                else
+                {
+                    return;
                 }
 
-                Console.WriteLine();
-                for (int i = 0; i < gamesPlayed; i++)
-                {
-                    var game = GetGame();
-                    game.RegisterPlayer(firstPlayer);
-                    game.RegisterPlayer(secondPlayer);
-                    game.StartGame();
-                    var firstSum = game.PlayerVisited[firstPlayer].Sum(x => x.Number);
-                    var secondSum = game.PlayerVisited[secondPlayer].Sum(x => x.Number);
-                    if (firstSum > secondSum)
-                    {
-                        aiPlayers[firstPlayer]++;
-                    }
+                Console.WriteLine($"{res.X} {res.Y}");
+            }
+        }
+        else
+        {
+            var game = new Game(11);
+            var res = AI.DeepPurple(game);
+        }
+    }
 
-                    if (secondSum > firstSum)
-                    {
-                        aiPlayers[secondPlayer]++;
-                    }
-                }
+    private static Game FirstTime()
+    {
+        var n = int.Parse(Console.ReadLine());
+        game = new Game((n - 1) / 2);
+
+        for (var y = 0; y < n ; y++)
+        {
+            var row = Console.ReadLine().Split().Select(x => int.Parse(x)).ToArray();
+            for (int x = 0; x < n; x++)
+            {
+                game.Field.Map[x, y] = new Cell(row[x]);
+                game.Field.Map[x, y].IsVisited = row[x] < 0;
             }
         }
 
-        foreach (var player in aiPlayers.Keys)
+        var inp = Console.ReadLine().Split().Select(x => int.Parse(x)).ToArray();
+        if (inp[0] == -1)
         {
-            var winrate = (double)aiPlayers[player] / (gamesPlayed * (aiPlayers.Count) * (aiPlayers.Count - 1));
-            Console.WriteLine($"Winrate of {player.GetName()} is {winrate}");
+            game.IsFirstMove = true;
         }
+        else
+        {
+            game.IsFirstMove = false;
+            game.CurrentPoint = new Point(inp[0], inp[1]);
+            game.Field[game.CurrentPoint].IsVisited = true;
+        }
+
+        return game;
+    }
+    
+    private static Game SecondTime()
+    {
+        var point = Console.ReadLine().Split().Select(x => int.Parse(x)).ToArray();
+        var pointP = new Point(point[0], point[1]);
+        game.Field[pointP].IsVisited = true;
+        game.CurrentPoint = pointP;
+        return game;
     }
 }
