@@ -91,7 +91,7 @@ public class Program
         FirstTime();
         var res = AI.DeepPurple(game);
         game.Field[res].IsVisited = true;
-        Console.WriteLine($"{res.X} {res.Y}");
+        Console.WriteLine($"{res.Y} {res.X}");
         while (true)
         {
             var game = SecondTime();
@@ -106,7 +106,7 @@ public class Program
                 return;
             }
 
-            Console.WriteLine($"{res.X} {res.Y}");
+            Console.WriteLine($"{res.Y} {res.X}");
         }
     }
 
@@ -133,7 +133,7 @@ public class Program
         else
         {
             game.IsFirstMove = false;
-            game.CurrentPoint = new Point(inp[0], inp[1]);
+            game.CurrentPoint = new Point(inp[1], inp[0]);
             game.Field[game.CurrentPoint].IsVisited = true;
         }
 
@@ -143,7 +143,7 @@ public class Program
     private static Game SecondTime()
     {
         var point = Console.ReadLine().Split().Select(x => int.Parse(x)).ToArray();
-        var pointP = new Point(point[0], point[1]);
+        var pointP = new Point(point[1], point[0]);
         game.Field[pointP].IsVisited = true;
         game.CurrentPoint = pointP;
         return game;
